@@ -9944,6 +9944,13 @@ impl Editor {
                 self.update_edit_prediction_settings(cx);
                 cx.notify();
             }
+            multi_buffer::Event::SettingsChanged => {
+                let new_language_settings = self.fetch_applicable_language_settings(cx);
+                if new_language_settings != self.applicable_language_settings {
+                    self.applicable_language_settings = new_language_settings;
+                    cx.notify();
+                }
+            }
             multi_buffer::Event::DirtyChanged => cx.emit(EditorEvent::DirtyChanged),
             multi_buffer::Event::Saved => cx.emit(EditorEvent::Saved),
             multi_buffer::Event::FileHandleChanged => {
@@ -10027,7 +10034,7 @@ impl Editor {
                 let buffer = buffer.read(cx);
                 let language = buffer.language().map(|language| language.name());
                 if let hash_map::Entry::Vacant(v) = acc.entry(language) {
-                    v.insert(LanguageSettings::for_buffer(&buffer, cx).into_owned());
+                    v.insert(LanguageSettings::for_buffer(buffer, cx).into_owned());
                 }
                 acc
             },
