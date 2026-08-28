@@ -9,8 +9,8 @@ use language_model::{
     LanguageModelCompletionError, LanguageModelCompletionEvent, LanguageModelId, LanguageModelName,
     LanguageModelProvider, LanguageModelProviderId, LanguageModelProviderName,
     LanguageModelProviderState, LanguageModelRequest, LanguageModelToolChoice,
-    LanguageModelToolResultContent, LanguageModelToolSchemaFormat, LanguageModelToolUse,
-    MessageContent, ProviderSettingsView, RateLimiter, Role, StopReason, TokenUsage, env_var,
+    LanguageModelToolResultContent, LanguageModelToolUse, MessageContent, ProviderSettingsView,
+    RateLimiter, Role, StopReason, TokenUsage, env_var,
 };
 use open_ai::completion::ReasoningDetailsAccumulator;
 use open_router::{
@@ -352,15 +352,6 @@ impl LanguageModel for OpenRouterLanguageModel {
 
     fn supports_thinking(&self) -> bool {
         matches!(self.model.mode, OpenRouterModelMode::Thinking { .. })
-    }
-
-    fn tool_input_format(&self) -> LanguageModelToolSchemaFormat {
-        let model_id = self.model.id().trim().to_lowercase();
-        if model_id.contains("gemini") || model_id.contains("grok") {
-            LanguageModelToolSchemaFormat::JsonSchemaSubset
-        } else {
-            LanguageModelToolSchemaFormat::JsonSchema
-        }
     }
 
     fn telemetry_id(&self) -> String {
